@@ -7,4 +7,13 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+<!--    Custom colors-->
+
+    <color name="cadit_blue">#0b0b27</color>
+    <color name="midnight_blue">#1d1b49</color>
+    <color name="midnight_blue_light">#312f69</color>
+    <color name="dark_slate_green">#315165</color>
+    <color name="gainsboro">#ead6e1</color>
+
 </resources>

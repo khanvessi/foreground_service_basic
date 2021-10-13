@@ -1,15 +1,13 @@
-package com.example.audiomusicapp
+package com.example.audiomusicapp.ui
 
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.Window
-import android.view.WindowManager
 import android.widget.Toast
+import com.example.audiomusicapp.MusicService
+import com.example.audiomusicapp.adapters.ViewPagerAdapter
 import com.example.audiomusicapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -29,9 +27,19 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(binding.root)
 
-        binding.ivEminem.setOnClickListener(View.OnClickListener {
-            startStopService()
-        })
+        val fragmentAdapter = ViewPagerAdapter(supportFragmentManager)
+        fragmentAdapter.addFragment(HipHopFragment(),"HipHop")
+        fragmentAdapter.addFragment(PopFragment(),"Pop")
+        fragmentAdapter.addFragment(RockFragment(),"Rock")
+
+        binding.apply {
+        viewPager.adapter = fragmentAdapter
+        tablayout.setupWithViewPager(viewPager)
+        }
+
+//        binding.ivEminem.setOnClickListener(View.OnClickListener {
+//            startStopService()
+//        })
     }
 
     private fun startStopService() {
