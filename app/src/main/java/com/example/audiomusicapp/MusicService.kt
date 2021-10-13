@@ -10,9 +10,8 @@ import androidx.annotation.RequiresApi
 class MusicService : Service() {
 
     private lateinit var musicPlayer: MediaPlayer
-    val CHANNEL_ID = "my_id"
+    val CHANNEL_ID = "my_channel_id"
     val MUSIC_NOTIFICATION_ID = 111
-
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
