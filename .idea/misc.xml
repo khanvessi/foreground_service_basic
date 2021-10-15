@@ -7,7 +7,12 @@
         <entry key="..\:/Users/Khan/AndroidStudioProjects/AudioMusicApp/app/src/main/res/drawable/ic_hiphop.xml" value="0.20092592592592592" />
         <entry key="..\:/Users/Khan/AndroidStudioProjects/AudioMusicApp/app/src/main/res/drawable/ic_pop.xml" value="0.20092592592592592" />
         <entry key="..\:/Users/Khan/AndroidStudioProjects/AudioMusicApp/app/src/main/res/drawable/ic_rock.xml" value="0.20092592592592592" />
-        <entry key="..\:/Users/Khan/AndroidStudioProjects/AudioMusicApp/app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="..\:/Users/Khan/AndroidStudioProjects/AudioMusicApp/app/src/main/res/layout/activity_main.xml" value="0.184375" />
+        <entry key="..\:/Users/Khan/AndroidStudioProjects/AudioMusicApp/app/src/main/res/layout/fragment_hip_hop.xml" value="0.13229166666666667" />
+        <entry key="..\:/Users/Khan/AndroidStudioProjects/AudioMusicApp/app/src/main/res/layout/fragment_pop.xml" value="0.13229166666666667" />
+        <entry key="..\:/Users/Khan/AndroidStudioProjects/AudioMusicApp/app/src/main/res/layout/fragment_rock.xml" value="0.13229166666666667" />
+        <entry key="..\:/Users/Khan/AndroidStudioProjects/AudioMusicApp/app/src/main/res/layout/item_hiphop.xml" value="0.184375" />
+        <entry key="..\:/Users/Khan/AndroidStudioProjects/AudioMusicApp/app/src/main/res/layout/item_track.xml" value="0.18385416666666668" />
       </map>
     </option>
   </component>

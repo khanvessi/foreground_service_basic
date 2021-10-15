@@ -6,9 +6,14 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
-import com.example.audiomusicapp.MusicService
+import androidx.lifecycle.lifecycleScope
+import com.example.audiomusicapp.services.MusicService
 import com.example.audiomusicapp.adapters.ViewPagerAdapter
+import com.example.audiomusicapp.data.MusicDatabase
 import com.example.audiomusicapp.databinding.ActivityMainBinding
+import com.example.audiomusicapp.models.Track
+import com.example.audiomusicapp.ui.hiphop.HipHopFragment
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,14 +32,112 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(binding.root)
 
+        val dao = MusicDatabase.getDatabase(this).musicDao()
+
+
+        val listOfTracks = listOf(
+            //EM
+            Track(
+                track = "https://audiojungle.net/item/jazzy-boom-bap/34155691",
+                artistPic = "https://images.unsplash.com/photo-1600962815726-457c46a12681?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=388&q=80",
+
+                artistName = "Eminem"
+            ),
+
+            //NF
+            Track(
+                track = "https://audiojungle.net/item/jazzy-boom-bap/34155691",
+                artistPic = "https://images.unsplash.com/photo-1623531249239-07774b804ac8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=412&q=80",
+
+                artistName = "NF"
+            ),
+
+            Track(
+                track = "https://audiojungle.net/item/jazzy-boom-bap/34155691",
+                artistPic = "https://images.unsplash.com/photo-1600962815726-457c46a12681?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=388&q=80",
+
+                artistName = "Eminem"
+            ),
+
+            Track(
+                track = "https://audiojungle.net/item/jazzy-boom-bap/34155691",
+                artistPic = "https://images.unsplash.com/photo-1543379344-402b42ddbe8a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1528&q=80",
+
+                artistName = "2PAC"
+            ),
+
+
+            Track(
+                track = "https://audiojungle.net/item/jazzy-boom-bap/34155691",
+                artistPic = "https://images.unsplash.com/photo-1623531249239-07774b804ac8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=412&q=80",
+
+                artistName = "NF"
+            ),
+
+            //2pac
+
+            Track(
+                track = "https://audiojungle.net/item/jazzy-boom-bap/34155691",
+                artistPic = "https://images.unsplash.com/photo-1543379344-402b42ddbe8a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1528&q=80",
+
+                artistName = "2PAC"
+            ),
+
+            Track(
+                track = "https://audiojungle.net/item/jazzy-boom-bap/34155691",
+                artistPic = "https://images.unsplash.com/photo-1623531249239-07774b804ac8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=412&q=80",
+
+                artistName = "NF"
+            ),
+
+
+            //drake
+            Track(
+                track = "https://audiojungle.net/item/jazzy-boom-bap/34155691",
+                artistPic = "https://images.unsplash.com/photo-1543379344-402b42ddbe8a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1528&q=80",
+
+                artistName = "Drake"
+            ),
+
+            Track(
+                track = "https://audiojungle.net/item/jazzy-boom-bap/34155691",
+                artistPic = "https://images.unsplash.com/photo-1543379344-402b42ddbe8a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1528&q=80",
+
+                artistName = "Drake"
+            ),
+
+            Track(
+                track = "https://audiojungle.net/item/jazzy-boom-bap/34155691",
+                artistPic = "https://images.unsplash.com/photo-1543379344-402b42ddbe8a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1528&q=80",
+
+                artistName = "2PAC"
+            ),
+
+            Track(
+                track = "https://audiojungle.net/item/jazzy-boom-bap/34155691",
+                artistPic = "https://images.unsplash.com/photo-1543379344-402b42ddbe8a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1528&q=80",
+
+                artistName = "Drake"
+            ),
+
+            )
+
+        lifecycleScope.launch {
+            dao.insertListOfTracks(
+                listOfTracks
+            )
+        }
+
+
+
         val fragmentAdapter = ViewPagerAdapter(supportFragmentManager)
-        fragmentAdapter.addFragment(HipHopFragment(),"HipHop")
-        fragmentAdapter.addFragment(PopFragment(),"Pop")
-        fragmentAdapter.addFragment(RockFragment(),"Rock")
+        fragmentAdapter.addFragment(HipHopFragment(), "HipHop")
+        fragmentAdapter.addFragment(PopFragment(), "Pop")
+        fragmentAdapter.addFragment(RockFragment(), "Rock")
 
         binding.apply {
-        viewPager.adapter = fragmentAdapter
-        tablayout.setupWithViewPager(viewPager)
+            viewPager.adapter = fragmentAdapter
+            tablayout.setupWithViewPager(viewPager)
         }
 
 //        binding.ivEminem.setOnClickListener(View.OnClickListener {
