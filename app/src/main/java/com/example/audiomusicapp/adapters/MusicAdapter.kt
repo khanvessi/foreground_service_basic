@@ -1,15 +1,20 @@
 package com.example.audiomusicapp.adapters
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.audiomusicapp.databinding.ItemTrackBinding
 import com.example.audiomusicapp.models.Track
+import com.example.audiomusicapp.ui.hiphop.HipHopFragment
 
-class MusicAdapter(private val musicItemClickListener: MusicItemClickListener) : androidx.recyclerview.widget.ListAdapter<Track, MusicAdapter.MusicViewHolder>(
+class MusicAdapter(private val musicItemClickListener: MusicItemClickListener?) : androidx.recyclerview.widget.ListAdapter<Track, MusicAdapter.MusicViewHolder>(
 DiffCallBack()
 ) {
+
+    constructor() : this(null)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MusicViewHolder {
         val binding = ItemTrackBinding.inflate(LayoutInflater.from(parent.context),
@@ -18,14 +23,12 @@ DiffCallBack()
     }
 
     override fun onBindViewHolder(holder: MusicViewHolder, position: Int) {
-
         val currentItem = getItem(position)
         holder.bind(currentItem, musicItemClickListener)
     }
 
     class MusicViewHolder(private val binding: ItemTrackBinding) : RecyclerView.ViewHolder(binding.root){
-        fun bind(currentItem: Track, musicItemClickListener: MusicItemClickListener) {
-
+        fun bind(currentItem: Track, musicItemClickListener: MusicItemClickListener?) {
             binding.listener = musicItemClickListener
             binding.track = currentItem
             binding.executePendingBindings()
@@ -45,7 +48,7 @@ class DiffCallBack : DiffUtil.ItemCallback<Track>(){
     }
 }
 
-class MusicItemClickListener(val clickListener: () -> Unit){
-    fun onPlayClick() = clickListener()
+class MusicItemClickListener(val clickListener: (view: View) -> Unit){
+    fun onPlayClick(view: View) = clickListener(view)
     //fun onDeleteClick(deleteEmployee: Employee) = onDeleteClickListener(deleteEmployee)
 }

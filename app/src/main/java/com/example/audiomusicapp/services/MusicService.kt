@@ -9,20 +9,20 @@ import android.app.Service
 import android.media.MediaPlayer
 import android.media.MediaPlayer.OnCompletionListener
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
 import androidx.annotation.Nullable
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.audiomusicapp.R
 import com.example.audiomusicapp.Utils.Constants
 import com.example.audiomusicapp.ui.hiphop.HipHopFragment
+import okhttp3.internal.notify
 import java.lang.UnsupportedOperationException
 
 
 class MusicService : Service() {
-    object MUSIC_COMPLETE {
-        const val MUSIC_COMPLETE = "MusicComplete"
-    }
 
     val TAG = "MyTag"
 
@@ -36,11 +36,11 @@ class MusicService : Service() {
         mPlayer = MediaPlayer.create(this, R.raw.music)
 
         mPlayer!!.setOnCompletionListener {
-//            val intent =
-//                Intent("music_complete")
-//            intent.putExtra("message_key", "done")
-//            LocalBroadcastManager.getInstance(applicationContext)
-//                .sendBroadcast(intent)
+            val intent =
+                Intent("music_complete")
+            intent.putExtra("message_key", "done")
+            LocalBroadcastManager.getInstance(applicationContext)
+                .sendBroadcast(intent)
             stopForeground(true)
             stopSelf()
         }
@@ -50,6 +50,7 @@ class MusicService : Service() {
         fun getService(): MusicService = this@MusicService
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         when (intent.action) {
             Constants.MUSIC_SERVICE_ACTION_PLAY -> {
@@ -100,8 +101,10 @@ class MusicService : Service() {
 
 
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun showNotification() {
-        val builder: NotificationCompat.Builder = NotificationCompat.Builder(this, "channelId")
+        val manager = getSystemService(NOTIFICATION_SERVICE)
+        val builder: NotificationCompat.Builder = NotificationCompat.Builder(this, Constants.MUSIC_CHANNEL_ID)
         //Intent for play button
         val pIntent =
             Intent(this, MusicService::class.java)
@@ -124,6 +127,7 @@ class MusicService : Service() {
         builder.setContentTitle("Music Player")
             .setContentText("This is demo music player")
             .setSmallIcon(R.mipmap.ic_launcher)
+            .setPriority(NotificationManager.IMPORTANCE_HIGH)
             .addAction(
                 NotificationCompat.Action(
                     android.R.drawable.ic_media_play,
@@ -146,6 +150,7 @@ class MusicService : Service() {
                 )
             )
         startForeground(123, builder.build())
+        //manager.notify()
     }
 
     @Nullable

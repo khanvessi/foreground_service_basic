@@ -18,6 +18,8 @@ class HipHopViewModel(val context: Context):ViewModel() {
 
     val listOfTracks = MutableLiveData<List<Track>>()
     var listOfLiveDataTracks: LiveData<List<Track>> = listOfTracks
+    var isPlaying = MutableLiveData<Boolean>()
+
 
     var track = Track(track = "", artistPic = "", artistName = "")
 

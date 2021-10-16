@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.GridLayoutManager
@@ -29,8 +30,9 @@ class HipHopFragment : Fragment() {
     lateinit var binding: FragmentHipHopBinding
     lateinit var hipHopViewModel: HipHopViewModel
     private var mMusicPlayerService: MusicService? = null
-    val MESSAGE_KEY = "message_key"
-
+    val MESSAGE_KEY = "done"
+    val musicAdapter = MusicAdapter()
+    var isPlaying = MutableLiveData<Boolean>(true)
 
     //SERVICECONNECTION
     private val mServiceCon: ServiceConnection = object : ServiceConnection {
@@ -42,7 +44,7 @@ class HipHopFragment : Fragment() {
             Log.d("on service disconnected", "onServiceConnected")
             if (mMusicPlayerService!!.isPlaying()) {
                 //TODO: SET THIS BUTTON TEXT
-                //mPlayButton.setText("Pause")
+                isPlaying.value = true
             }
         }
 
@@ -51,15 +53,13 @@ class HipHopFragment : Fragment() {
             hipHopViewModel.mBound.value = false
         }
     }
-
     //BRAODCAST RECEIVER
     private var mReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
 //            String songName=intent.getStringExtra(MESSAGE_KEY);
             val result = intent.getStringExtra(MESSAGE_KEY)
             //TODO: CHANGE BUTTON TEXT
-            //if (result === "done") mPlayButton.setText("Play")
-
+            if (result === "done") isPlaying.value = false
             Log.d("onReceive", "onReceive: Thread name: " + Thread.currentThread().name)
         }
     }
@@ -87,6 +87,16 @@ class HipHopFragment : Fragment() {
         //ONPLAY CALLED HERE
         val musicAdapter = MusicAdapter(MusicItemClickListener {
             Log.e("onPlay", "CLICKED")
+            if(isPlaying.value == true)
+            {
+                it.setBackgroundResource(R.drawable.ic_pause_music)
+                isPlaying.value = false
+            }
+            else
+            {
+                it.setBackgroundResource(R.drawable.ic_play_music)
+                isPlaying.value = true
+            }
             startStopService()
         })
 
@@ -112,7 +122,7 @@ class HipHopFragment : Fragment() {
             if (mMusicPlayerService?.isPlaying() == true) {
                 mMusicPlayerService!!.pause()
                 //TODO: CHANGE BUTTON TEXT
-                //mPlayButton.setText("Play")
+                isPlaying.value = true
             } else {
                 val intent = Intent(requireContext(), MusicService::class.java)
                 intent.action = Constants.MUSIC_SERVICE_ACTION_START
@@ -123,7 +133,7 @@ class HipHopFragment : Fragment() {
                 }
                 mMusicPlayerService?.play()
                 //TODO: CHANGE BUTTON TEXT
-                //mPlayButton.setText("Play")
+                isPlaying.value = false
             }
         }
 
@@ -137,8 +147,8 @@ class HipHopFragment : Fragment() {
         requireContext().bindService(intent, mServiceCon, Context.BIND_AUTO_CREATE)
 
         //TODO: DO BROADCASTING LATER
-//        LocalBroadcastManager.getInstance(requireContext())
-//            .registerReceiver(mReceiver, IntentFilter(MusicService.MUSIC_COMPLETE))
+        LocalBroadcastManager.getInstance(requireContext())
+            .registerReceiver(mReceiver, IntentFilter(Constants.MUSIC_COMPLETE))
     }
 
     override fun onStop() {
@@ -147,7 +157,7 @@ class HipHopFragment : Fragment() {
             requireContext().unbindService(mServiceCon)
             hipHopViewModel.mBound.value = false
         }
-//        LocalBroadcastManager.getInstance(getApplicationContext())
-//            .unregisterReceiver(mReceiver)
+        LocalBroadcastManager.getInstance(requireContext())
+            .unregisterReceiver(mReceiver)
     }
 }
