@@ -1,23 +1,66 @@
 package com.example.audiomusicapp.ui
 
 import android.app.ActivityManager
-import android.content.Context
-import android.content.Intent
+import android.content.*
+import android.content.ContentValues.TAG
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.IBinder
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.audiomusicapp.Utils.Constants
 import com.example.audiomusicapp.services.MusicService
 import com.example.audiomusicapp.adapters.ViewPagerAdapter
 import com.example.audiomusicapp.data.MusicDatabase
 import com.example.audiomusicapp.databinding.ActivityMainBinding
 import com.example.audiomusicapp.models.Track
 import com.example.audiomusicapp.ui.hiphop.HipHopFragment
+import com.example.audiomusicapp.ui.main.MainViewModel
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private var mMusicPlayerService: MusicService? = null
+    val mainViewModel by viewModels<MainViewModel>()
+
+
+    //SERVICECONNECTION
+    private val mServiceCon: ServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName, iBinder: IBinder) {
+            val myServiceBinder: MusicService.LocalBinder =
+                iBinder as MusicService.LocalBinder
+            mMusicPlayerService = myServiceBinder.getService()
+            mainViewModel.mBound.value = true
+            Log.d("on service disconnected", "onServiceConnected")
+            if (mMusicPlayerService!!.isPlaying()) {
+                //TODO: SET THIS BUTTON TEXT
+                //mPlayButton.setText("Pause")
+            }
+        }
+
+        override fun onServiceDisconnected(name: ComponentName) {
+            Log.d("on Service connected", "onServiceDisconnected")
+            mainViewModel.mBound.value = false
+        }
+    }
+
+    //BRAODCAST RECEIVER
+    private var mReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+//            String songName=intent.getStringExtra(MESSAGE_KEY);
+            val result = intent.getStringExtra(Constants.MESSAGE_KEY)
+            //TODO: CHANGE BUTTON TEXT
+            //if (result === "done") mPlayButton.setText("Play")
+
+            Log.d("onReceive", "onReceive: Thread name: " + Thread.currentThread().name)
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -128,8 +171,6 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-
-
         val fragmentAdapter = ViewPagerAdapter(supportFragmentManager)
         fragmentAdapter.addFragment(HipHopFragment(), "HipHop")
         fragmentAdapter.addFragment(PopFragment(), "Pop")
@@ -140,46 +181,58 @@ class MainActivity : AppCompatActivity() {
             tablayout.setupWithViewPager(viewPager)
         }
 
-//        binding.ivEminem.setOnClickListener(View.OnClickListener {
-//            startStopService()
-//        })
-    }
 
-    private fun startStopService() {
-        if (isMyServiceRunning(MusicService::class.java)) {
-            Toast.makeText(
-                this,
-                "Service Stopped",
-                Toast.LENGTH_LONG
-            ).show()
-
-            stopService(Intent(this, MusicService::class.java))
-
-        } else {
-            Toast.makeText(
-                this,
-                "Service Started",
-                Toast.LENGTH_LONG
-            ).show()
-
-            startService(Intent(this, MusicService::class.java))
-        }
-
-
-    }
-
-    private fun isMyServiceRunning(mClass: Class<MusicService>): Boolean {
-
-        val manager: ActivityManager = getSystemService(
-            Context.ACTIVITY_SERVICE
-        ) as ActivityManager
-
-        for (service: ActivityManager.RunningServiceInfo in manager.getRunningServices(Integer.MAX_VALUE)) {
-
-            if (mClass.name.equals(service.service.className)) {
-                return true
+        mainViewModel.playStopMusic.observe(this,){
+            if(it) {
+                startStopService()
+                Log.e(TAG, "OBSERVE: CALLED", )
             }
         }
-        return false
+    }
+
+
+    private fun startStopService() {
+        if (mainViewModel.mBound.value == true) {
+            if (mMusicPlayerService?.isPlaying() == true) {
+                mMusicPlayerService!!.pause()
+                //TODO: CHANGE BUTTON TEXT
+                //mPlayButton.setText("Play")
+                mainViewModel.playPause.value = false
+            } else {
+                val intent = Intent(this, MusicService::class.java)
+                intent.action = Constants.MUSIC_SERVICE_ACTION_START
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                   startForegroundService(intent)
+                } else {
+                    startService(intent)
+                }
+                mMusicPlayerService?.play()
+                //TODO: CHANGE BUTTON TEXT
+                //mPlayButton.setText("Play")
+                mainViewModel.playPause.value = true
+            }
+        }
+    }
+
+
+    override fun onStart() {
+        super.onStart()
+        Log.d("onStart", "onStart: called")
+        val intent = Intent(this, MusicService::class.java)
+        bindService(intent, mServiceCon, Context.BIND_AUTO_CREATE)
+
+        //TODO: DO BROADCASTING LATER
+//        LocalBroadcastManager.getInstance(requireContext())
+//            .registerReceiver(mReceiver, IntentFilter(MusicService.MUSIC_COMPLETE))
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (mainViewModel.mBound.value == true) {
+            unbindService(mServiceCon)
+            mainViewModel.mBound.value = false
+        }
+        LocalBroadcastManager.getInstance(this)
+            .unregisterReceiver(mReceiver)
     }
 }

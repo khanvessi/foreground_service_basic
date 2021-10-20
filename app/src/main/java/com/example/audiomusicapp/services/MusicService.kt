@@ -73,14 +73,8 @@ class MusicService : Service() {
                         "onStartCommand: stop called"
                     )
                     stopForeground(true)
+                    mPlayer?.pause()
                     stopSelf()
-                }
-                run {
-                    Log.d(
-                        "onStartCommand",
-                        "onStartCommand: start called"
-                    )
-                    showNotification()
                 }
             }
             Constants.MUSIC_SERVICE_ACTION_START -> {
@@ -96,9 +90,6 @@ class MusicService : Service() {
         Log.d("onStartCommand", "onStartCommand: ")
         return START_NOT_STICKY
     }
-
-
-
 
     private fun showNotification() {
         val builder: NotificationCompat.Builder = NotificationCompat.Builder(this, "channelId")
